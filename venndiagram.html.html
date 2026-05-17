@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set Theory Ane Venn Diagram Shikhavanu Sadhan</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-from:    #06080f;
+  --bg-to:      #0d1526;
+  --glass:      rgba(255,255,255,0.04);
+  --glass-hi:   rgba(255,255,255,0.09);
+  --border:     rgba(255,255,255,0.10);
+  --border-hi:  rgba(255,255,255,0.22);
+  --cyan:       #00e5ff;
+  --magenta:    #e040fb;
+  --gold:       #ffd54f;
+  --green:      #69ff74;
+  --red:        #ff4444;
+  --blue:       #448aff;
+  --orange:     #ff9100;
+  --teal:       #26c6da;
+  --text-1:     #eef2ff;
+  --text-2:     #94a3b8;
+  --text-3:     #475569;
+  --r: 14px;
+  --r-lg: 20px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-to) 100%);
+  color: var(--text-1);
+}
+
+body::before {
+  content: '∪ ∩ ∅ ⊂ ⊆ ∈ ∉ ξ △ −';
+  position: fixed; inset: 0; z-index: 0;
+  font-size: 6rem;
+  color: rgba(255,255,255,0.012);
+  word-spacing: 3rem; letter-spacing: 2rem; line-height: 2;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.page {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+}
+
+/* ── HEADER STYLE ── */
+header {
+  flex-shrink: 0;
+  padding: 0.45rem 1.1rem 0.4rem;
+  background: rgba(6,8,15,0.88);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 0.8rem;
+}
+
+.header-title { text-align: center; }
+.header-title h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.25rem);
+  font-weight: 700; letter-spacing: 0.05em;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1.1;
+}
+.header-title p {
+  font-size: 0.62rem; color: var(--text-2);
+  letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px;
+}
+
+.top-left-info { display: flex; align-items: center; gap: 0.5rem; }
+.top-controls  { display: flex; align-items: center; gap: 0.4rem; justify-content: flex-end; flex-wrap: wrap; }
+
+.stat-pill {
+  background: var(--glass); border: 1px solid var(--border); border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 500;
+  color: var(--text-1); white-space: nowrap;
+}
+.stat-pill .lbl { color: var(--text-2); margin-right: 3px; }
+.stat-pill .val { color: var(--gold); }
+
+#timer-display {
+  background: var(--glass); border: 1px solid var(--border); border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700;
+  color: var(--cyan); letter-spacing: 0.05em;
+  transition: color 0.3s, border-color 0.3s, box-shadow 0.3s; white-space: nowrap;
+}
+
+.btn {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--glass); color: var(--text-1);
+  font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.btn:hover { background: var(--glass-hi); border-color: var(--border-hi); transform: translateY(-1px); }
+.btn:active { transform: scale(0.95); }
+.btn-check  { border-color: var(--green);   color: var(--green); }
+.btn-check:hover  { background: rgba(105,255,116,0.12); box-shadow: 0 0 14px rgba(105,255,116,0.25); }
+.btn-fill   { border-color: var(--teal);    color: var(--teal); }
+.btn-fill:hover   { background: rgba(38,198,218,0.12);  box-shadow: 0 0 14px rgba(38,198,218,0.25); }
+.btn-reset  { border-color: var(--orange);  color: var(--orange); }
+.btn-reset:hover  { background: rgba(255,145,0,0.12);   box-shadow: 0 0 14px rgba(255,145,0,0.25); }
+.btn-new    { border-color: var(--magenta); color: var(--magenta); }
+.btn-new:hover    { background: rgba(224,64,251,0.12);  box-shadow: 0 0 14px rgba(224,64,251,0.3); }
+.btn-mode   { border-color: var(--blue); color: var(--blue); min-width: 60px; text-align: center; }
+.btn-mode.active  { background: rgba(68,138,255,0.2);   box-shadow: 0 0 12px rgba(68,138,255,0.3); }
+.btn-mode:hover   { background: rgba(68,138,255,0.15);  box-shadow: 0 0 12px rgba(68,138,255,0.25); }
+
+/* ── BODY STYLE ── */
+.app-body {
+  flex: 1; min-height: 0;
+  display: flex; gap: 0.75rem;
+  padding: 0.65rem 0.9rem 0.45rem;
+  overflow: hidden;
+}
+
+/* ── LEFT PANEL ── */
+.venn-panel {
+  flex: 0 0 auto; width: 48%; /* Thodu motu karyu chhe */
+  display: flex; flex-direction: column; gap: 0.5rem; overflow: hidden;
+}
+
+.venn-card {
+  flex: 1; min-height: 0;
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: var(--r-lg); backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; overflow: hidden; position: relative;
+}
+
+.venn-card-header {
+  flex-shrink: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0.85rem; border-bottom: 1px solid var(--border);
+}
+.venn-card-header .card-lbl {
+  font-size: 10px; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan);
+}
+
+.set-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+.set-pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; /* Mota aksharo */
+  padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid;
+}
+.set-pill.a { border-color: var(--cyan);    color: var(--cyan);    background: rgba(0,229,255,0.07); }
+.set-pill.b { border-color: var(--magenta); color: var(--magenta); background: rgba(224,64,251,0.07); }
+.set-pill.u { border-color: var(--gold);    color: var(--gold);    background: rgba(255,213,79,0.07); }
+
+#venn-svg {
+  flex: 1; display: block; width: 100%; height: 100%;
+  overflow: visible;
+}
+
+.elem-text {
+  font-family: 'JetBrains Mono', monospace; 
+  font-size: 19px; /* Mota ankada (Bigger elements) */
+  font-weight: 700;
+  text-anchor: middle; dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* ── RIGHT PANEL ── */
+.ops-panel {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 0.5rem; overflow: hidden;
+}
+
+.ops-card {
+  flex: 1; min-height: 0;
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: var(--r-lg); backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.ops-header {
+  flex-shrink: 0; padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ops-header .card-lbl {
+  font-size: 10px; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--magenta);
+}
+.ops-header .hint { font-size: 0.7rem; color: var(--text-2); }
+
+.ops-list {
+  flex: 1; overflow-y: auto;
+  padding: 0.4rem 0.6rem;
+  display: flex; flex-direction: column; gap: 0.25rem;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.ops-list::-webkit-scrollbar { width: 6px; }
+.ops-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+.op-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 1.8fr 24px; /* Moto textbox mate space */
+  align-items: center; gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--r); border: 1px solid transparent;
+  transition: background 0.2s, border-color 0.2s; cursor: pointer;
+}
+.op-row:hover { background: var(--glass-hi); border-color: var(--border); }
+.op-row.selected { background: rgba(0,229,255,0.06); border-color: rgba(0,229,255,0.22); }
+
+.op-check {
+  appearance: none; width: 16px; height: 16px;
+  border: 1.5px solid var(--border-hi); border-radius: 50%;
+  background: transparent; cursor: pointer; flex-shrink: 0;
+  position: relative; transition: all 0.2s;
+}
+.op-check:checked { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 7px rgba(0,229,255,0.4); }
+.op-check:checked::after {
+  content: ''; position: absolute; top: 3.5px; left: 3.5px;
+  width: 6px; height: 6px; border-radius: 50%; background: #000;
+}
+
+.op-name {
+  font-size: 0.85rem; font-family: 'Outfit', sans-serif; font-weight: 500;
+  color: var(--text-1); white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; user-select: none;
+}
+
+.op-input {
+  background: rgba(0,0,0,0.35); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text-1);
+  font-family: 'JetBrains Mono', monospace; 
+  font-size: 0.95rem; /* Moto text input */
+  padding: 0.35rem 0.5rem; /* Vadhu space */
+  outline: none; width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.op-input:focus   { border-color: var(--cyan);  box-shadow: 0 0 0 2px rgba(0,229,255,0.12); }
+.op-input.correct { border-color: var(--green); box-shadow: 0 0 0 2px rgba(105,255,116,0.18); background: rgba(105,255,116,0.05); }
+.op-input.wrong   { border-color: var(--red);   box-shadow: 0 0 0 2px rgba(255,68,68,0.18);  background: rgba(255,68,68,0.04); }
+
+.op-icon { font-size: 1rem; text-align: center; line-height: 1; flex-shrink: 0; }
+.op-icon.correct { color: var(--green); }
+.op-icon.wrong   { color: var(--red); }
+
+/* ── FOOTER STYLE ── */
+footer {
+  flex-shrink: 0; text-align: center; padding: 0.3rem 1rem;
+  font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-3); border-top: 1px solid var(--border);
+  background: rgba(6,8,15,0.6);
+}
+
+@media (max-width: 768px) {
+  html, body { overflow: auto; height: auto; }
+  .page { height: auto; overflow: visible; }
+  .app-body { flex-direction: column; overflow: visible; padding: 0.5rem; gap: 0.5rem; }
+  .venn-panel { width: 100%; }
+  #venn-svg { height: 260px; }
+  header { grid-template-columns: 1fr; gap: 0.35rem; }
+  .top-left-info, .top-controls { justify-content: center; flex-wrap: wrap; }
+  .header-title { order: -1; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<header>
+  <div class="top-left-info">
+    <div id="timer-display">⏱ 00:00</div>
+    <div class="stat-pill"><span class="lbl">Score</span><span class="val" id="score-val">0/0</span></div>
+    <div class="stat-pill"><span class="lbl">Set</span><span class="val" id="qnum-val">—</span></div>
+  </div>
+
+  <div class="header-title">
+    <h1>Set Theory ane Venn Diagram Dynamic</h1>
+    <p>Design by: Bikash Bhusal</p>
+  </div>
+
+  <div class="top-controls">
+    <button class="btn btn-check" onclick="checkAnswers()">✓ Check </button>
+    <button class="btn btn-fill"  onclick="fillAnswers()">◈ Show Answer</button>
+    <button class="btn btn-reset" onclick="resetAnswers()">↺ Reset </button>
+    <button class="btn btn-new"   onclick="newRandomSet()">⚡ New Set</button>
+    <button class="btn btn-mode active" id="btn-numbers" onclick="setMode('numbers')">Number</button>
+    <button class="btn btn-mode"        id="btn-letters" onclick="setMode('letters')">ABC</button>
+  </div>
+</header>
+
+<!-- BODY -->
+<div class="app-body">
+
+  <!-- LEFT: VENN DIAGRAM -->
+  <div class="venn-panel">
+    <div class="venn-card">
+      <div class="venn-card-header">
+        <span class="card-lbl">Venn Diagram</span>
+        <div class="set-pills">
+          <span class="set-pill u">ξ = <span id="pill-u">?</span></span>
+          <span class="set-pill a">A = <span id="pill-a">?</span></span>
+          <span class="set-pill b">B = <span id="pill-b">?</span></span>
+        </div>
+      </div>
+
+      <svg id="venn-svg" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Glow filters -->
+          <filter id="fw-c" x="-25%" y="-25%" width="150%" height="150%">
+            <feGaussianBlur stdDeviation="3.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="fw-m" x="-25%" y="-25%" width="150%" height="150%">
+            <feGaussianBlur stdDeviation="3.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          
+          <!-- Mathematical Masks for Perfect Shading -->
+          <!-- A-Only Mask: Keep A, Remove B -->
+          <mask id="mask-a-only">
+            <rect x="0" y="0" width="500" height="300" fill="white"/>
+            <circle cx="315" cy="150" r="108" fill="black"/>
+          </mask>
+          
+          <!-- B-Only Mask: Keep B, Remove A -->
+          <mask id="mask-b-only">
+            <rect x="0" y="0" width="500" height="300" fill="white"/>
+            <circle cx="185" cy="150" r="108" fill="black"/>
+          </mask>
+
+          <!-- Intersection Mask: Keep only overlapping part -->
+          <mask id="mask-ab">
+            <rect x="0" y="0" width="500" height="300" fill="black"/>
+            <circle cx="315" cy="150" r="108" fill="white"/>
+          </mask>
+
+          <!-- Outer Mask: Keep everything, remove A and B -->
+          <mask id="mask-outer">
+            <rect x="0" y="0" width="500" height="300" fill="white"/>
+            <circle cx="185" cy="150" r="108" fill="black"/>
+            <circle cx="315" cy="150" r="108" fill="black"/>
+          </mask>
+        </defs>
+
+        <!-- White background inside universal rectangle -->
+        <rect x="18" y="16" width="464" height="268" rx="11" fill="white" stroke="none"/>
+
+        <!-- ═══════════════════════════════════════════════════════
+             REGION FILLS - Hve Mask no upyog karvathi shading perfect thashe
+             ═══════════════════════════════════════════════════════ -->
+
+        <!-- A-only region (A-B) -->
+        <circle id="rfill-a" cx="185" cy="150" r="108" fill="transparent" mask="url(#mask-a-only)" style="transition:fill 0.25s;" />
+
+        <!-- B-only region (B-A) -->
+        <circle id="rfill-b" cx="315" cy="150" r="108" fill="transparent" mask="url(#mask-b-only)" style="transition:fill 0.25s;" />
+
+        <!-- Intersection region (A∩B) -->
+        <circle id="rfill-ab" cx="185" cy="150" r="108" fill="transparent" mask="url(#mask-ab)" style="transition:fill 0.25s;" />
+
+        <!-- Outer region (outside both circles) -->
+        <rect id="rfill-outer" x="18" y="16" width="464" height="268" rx="11" fill="transparent" mask="url(#mask-outer)" style="transition:fill 0.25s;" />
+
+        <!-- Circle outlines -->
+        <circle cx="185" cy="150" r="108" fill="none"
+                stroke="#00bcd4" stroke-width="2" filter="url(#fw-c)"/>
+        <circle cx="315" cy="150" r="108" fill="none"
+                stroke="#ce49f5" stroke-width="2" filter="url(#fw-m)"/>
+
+        <!-- Universal set rectangle outline -->
+        <rect x="18" y="16" width="464" height="268" rx="11"
+              fill="none" stroke="#b8860b" stroke-width="1.8" opacity="0.8"/>
+
+        <!-- Labels -->
+        <text x="33"  y="38" font-family="'Cinzel',serif" font-size="17" font-weight="700"
+              fill="#b8860b" opacity="0.85">ξ</text>
+        <text x="108" y="88" font-family="'Cinzel',serif" font-size="22" font-weight="700"
+              fill="#0097a7" filter="url(#fw-c)" opacity="0.95">A</text>
+        <text x="376" y="88" font-family="'Cinzel',serif" font-size="22" font-weight="700"
+              fill="#9c27b0" filter="url(#fw-m)" opacity="0.95">B</text>
+
+        <!-- Elements -->
+        <g id="elem-group"></g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- RIGHT: OPERATIONS PANEL -->
+  <div class="ops-panel">
+    <div class="ops-card">
+      <div class="ops-header">
+        <span class="card-lbl">Set Operations (Kriyao)</span>
+        <span class="hint">☑ Shade karva click karo · Jawab lakho · Check karo</span>
+      </div>
+      <div class="ops-list" id="ops-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Smart Ganit Shikshan Paddhati</footer>
+</div>
+
+<script>
+/* ============================================================
+   REGION COLOURS
+   ============================================================ */
+const SHADE_COLOUR = 'rgba(0, 229, 255, 0.35)';
+
+/* ============================================================
+   OPERATIONS - Mathematics ni drashtiye perfect formulas
+   Kadhi nakhela options: A'∩B, A∩B', A'UB
+   ============================================================ */
+const OPS = [
+  { id:'A', label:'A', regions:['a','ab'], compute: s => [...s.onlyA, ...s.both] },
+  { id:'B', label:'B', regions:['b','ab'], compute: s => [...s.onlyB, ...s.both] },
+  { id:'Ac', label:"A'", regions:['b','outer'], compute: s => [...s.onlyB, ...s.outer] },
+  { id:'Bc', label:"B'", regions:['a','outer'], compute: s => [...s.onlyA, ...s.outer] },
+  { id:'AuB', label:'A ∪ B', regions:['a','b','ab'], compute: s => [...s.onlyA, ...s.both, ...s.onlyB] },
+  { id:'AnB', label:'A ∩ B', regions:['ab'], compute: s => [...s.both] },
+  { id:'AuBc', label:"(A ∪ B)'", regions:['outer'], compute: s => [...s.outer] },
+  { id:'AnBc', label:"(A ∩ B)'", regions:['a','b','outer'], compute: s => [...s.onlyA, ...s.onlyB, ...s.outer] },
+  { id:'AmB', label:'A − B', regions:['a'], compute: s => [...s.onlyA] },
+  { id:'BmA', label:'B − A', regions:['b'], compute: s => [...s.onlyB] },
+  { id:'AdeltaB', label:'A △ B', regions:['a','b'], compute: s => [...s.onlyA, ...s.onlyB] },
+  { id:'XmA', label:'ξ − A', regions:['b','outer'], compute: s => [...s.onlyB, ...s.outer] }, // U - A equivalent
+  { id:'XmB', label:'ξ − B', regions:['a','outer'], compute: s => [...s.onlyA, ...s.outer] }  // U - B equivalent
+];
+
+/* ============================================================
+   STATE VARIABLES
+   ============================================================ */
+let mode = 'numbers';
+let sets = {};
+let score = { correct:0, total:0 };
+let questionCount = 0;
+let timerInterval = null;
+let timerSeconds  = 0; // Starts from 0 (increasing)
+
+/* ============================================================
+   SHADING - Radio behavior (khali ek j active)
+   ============================================================ */
+function applyShading() {
+  clearShading();
+  const activeOp = OPS.find(op => {
+    const chk = document.getElementById('chk-' + op.id);
+    return chk && chk.checked;
+  });
+
+  if (activeOp) {
+    activeOp.regions.forEach(r => {
+      const el = document.getElementById('rfill-' + r);
+      if (el) el.setAttribute('fill', SHADE_COLOUR);
+    });
+  }
+}
+
+function clearShading() {
+  ['a','b','ab','outer'].forEach(r => {
+    const el = document.getElementById('rfill-'+r);
+    if (el) el.setAttribute('fill', 'transparent');
+  });
+}
+
+function selectOperation(selectedId) {
+  OPS.forEach(op => {
+    const chk = document.getElementById('chk-' + op.id);
+    const row = document.getElementById('row-' + op.id);
+    if (!chk || !row) return;
+
+    if (op.id === selectedId) {
+      chk.checked = !chk.checked;
+      if (chk.checked) row.classList.add('selected');
+      else row.classList.remove('selected');
+    } else {
+      chk.checked = false;
+      row.classList.remove('selected');
+    }
+  });
+  applyShading();
+}
+
+/* ============================================================
+   BUILD OPERATIONS LIST
+   ============================================================ */
+function buildOpsList() {
+  const list = document.getElementById('ops-list');
+  list.innerHTML = '';
+  OPS.forEach(op => {
+    const row = document.createElement('div');
+    row.className = 'op-row';
+    row.id = 'row-'+op.id;
+    row.innerHTML = `
+      <input type="checkbox" class="op-check" id="chk-${op.id}"
+             onclick="event.stopPropagation(); selectOperation('${op.id}')">
+      <label class="op-name" for="chk-${op.id}" style="cursor:pointer">${op.label}</label>
+      <input type="text" class="op-input" id="inp-${op.id}"
+             placeholder="e.g. 2,4,6" onclick="event.stopPropagation()">
+      <span class="op-icon" id="icon-${op.id}"></span>
+    `;
+    row.addEventListener('click', () => {
+      selectOperation(op.id);
+    });
+    list.appendChild(row);
+  });
+}
+
+/* ============================================================
+   RANDOM SET GENERATION
+   ============================================================ */
+function randItems(pool, count) {
+  return [...pool].sort(() => Math.random()-0.5).slice(0, count);
+}
+
+function newRandomSet() {
+  const pool = mode === 'numbers'
+    ? Array.from({length:30}, (_,i)=>i+1)
+    : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const nA  = 2 + Math.floor(Math.random()*3);
+  const nAB = 1 + Math.floor(Math.random()*3);
+  const nB  = 2 + Math.floor(Math.random()*3);
+  const nO  = 1 + Math.floor(Math.random()*3);
+  const chosen = randItems(pool, nA+nAB+nB+nO);
+  sets = {
+    onlyA: chosen.slice(0, nA),
+    both:  chosen.slice(nA, nA+nAB),
+    onlyB: chosen.slice(nA+nAB, nA+nAB+nB),
+    outer: chosen.slice(nA+nAB+nB)
+  };
+  updatePills();
+  renderElements();
+  resetAnswers();
+  questionCount++;
+  updateStats();
+  restartTimer(); // starts fresh counting up
+}
+
+function updatePills() {
+  const srt = a => [...a].sort((x,y)=>String(x).localeCompare(String(y)));
+  const A = srt([...sets.onlyA, ...sets.both]);
+  const B = srt([...sets.onlyB, ...sets.both]);
+  const U = srt([...sets.onlyA, ...sets.both, ...sets.onlyB, ...sets.outer]);
+  document.getElementById('pill-a').textContent = '{'+A.join(',')+'}';
+  document.getElementById('pill-b').textContent = '{'+B.join(',')+'}';
+  document.getElementById('pill-u').textContent = '{'+U.join(',')+'}';
+}
+
+/* ============================================================
+   ELEMENT DISPERSAL
+   ============================================================ */
+function dist2(x1,y1,x2,y2){ return Math.hypot(x2-x1,y2-y1); }
+
+function scatterWithTest(cx, cy, r, count, test) {
+  const pts = []; let tries = 0;
+  while (pts.length < count && tries < 600) {
+    const ang = Math.random()*2*Math.PI;
+    const d   = Math.sqrt(Math.random())*r;
+    const x   = cx + d*Math.cos(ang);
+    const y   = cy + d*Math.sin(ang);
+    // distance thodi vadhari che mota ankada mate (>28)
+    if (test(x,y) && pts.every(p=>Math.hypot(p.x-x,p.y-y)>28)) pts.push({x,y});
+    tries++;
+  }
+  return pts;
+}
+
+function renderElements() {
+  const g = document.getElementById('elem-group');
+  g.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function place(items, pts, color) {
+    items.forEach((val, i) => {
+      if (!pts[i]) return;
+      const t = document.createElementNS(ns, 'text');
+      t.setAttribute('x', pts[i].x);
+      t.setAttribute('y', pts[i].y);
+      t.setAttribute('class', 'elem-text');
+      t.setAttribute('fill', color);
+      t.style.filter = 'drop-shadow(0 1px 3px rgba(255,255,255,0.4))';
+      t.textContent = val;
+      g.appendChild(t);
+    });
+  }
+
+  const pA = scatterWithTest(145, 150, 80, sets.onlyA.length,
+    (x,y)=>dist2(x,y,185,150)<=95 && dist2(x,y,315,150)>120
+          && x>35 && x<465 && y>35 && y<265);
+  place(sets.onlyA, pA, '#006080');
+
+  const pB = scatterWithTest(355, 150, 80, sets.onlyB.length,
+    (x,y)=>dist2(x,y,315,150)<=95 && dist2(x,y,185,150)>120
+          && x>35 && x<465 && y>35 && y<265);
+  place(sets.onlyB, pB, '#6a1b9a');
+
+  const pAB = scatterWithTest(250, 150, 38, sets.both.length,
+    (x,y)=>dist2(x,y,185,150)<=95 && dist2(x,y,315,150)<=95);
+  place(sets.both, pAB, '#1a237e');
+
+  const outerFixed = [
+    {x:65,y:45},{x:430,y:45},{x:65,y:255},{x:430,y:255},{x:50,y:150},{x:445,y:150}
+  ];
+  place(sets.outer, outerFixed, '#5d4037');
+}
+
+/* ============================================================
+   ANSWER VERIFICATION
+   ============================================================ */
+function parseAns(str) {
+  return str.split(',').map(s=>s.trim()).filter(s=>s!=='');
+}
+function arrEq(a,b) {
+  const sa=[...a].map(String).sort(), sb=[...b].map(String).sort();
+  return sa.length===sb.length && sa.every((v,i)=>v===sb[i]);
+}
+
+function checkAnswers() {
+  if (!sets.onlyA) return;
+  let c=0, t=0;
+  OPS.forEach(op => {
+    const inp  = document.getElementById('inp-'+op.id);
+    const icon = document.getElementById('icon-'+op.id);
+    const val  = inp.value.trim();
+    if (!val) {
+      inp.classList.remove('correct','wrong');
+      icon.textContent=''; icon.className='op-icon';
+      return;
+    }
+    t++;
+    const expected = op.compute(sets).map(String).sort();
+    const given    = parseAns(val).map(String).sort();
+    const ok = arrEq(expected, given);
+    inp.classList.remove('correct','wrong'); inp.classList.add(ok?'correct':'wrong');
+    icon.textContent = ok?'✓':'✗';
+    icon.className   = 'op-icon '+(ok?'correct':'wrong');
+    if(ok) c++;
+  });
+  score.correct += c; score.total += t;
+  updateStats();
+}
+
+/* ============================================================
+   SHOW ANSWERS
+   ============================================================ */
+function fillAnswers() {
+  if (!sets.onlyA) return;
+  OPS.forEach(op => {
+    const inp  = document.getElementById('inp-'+op.id);
+    const icon = document.getElementById('icon-'+op.id);
+    if (!inp) return;
+    const ans = op.compute(sets).map(String).sort().join(',');
+    inp.value = ans;
+    inp.classList.remove('correct','wrong');
+    if (icon) { icon.textContent=''; icon.className='op-icon'; }
+  });
+}
+
+/* ============================================================
+   RESET COMPONENT
+   ============================================================ */
+function resetAnswers() {
+  OPS.forEach(op => {
+    const inp  = document.getElementById('inp-'+op.id);
+    const icon = document.getElementById('icon-'+op.id);
+    const chk  = document.getElementById('chk-'+op.id);
+    const row  = document.getElementById('row-'+op.id);
+    if(inp)  { inp.value=''; inp.classList.remove('correct','wrong'); }
+    if(icon) { icon.textContent=''; icon.className='op-icon'; }
+    if(chk)  chk.checked=false;
+    if(row)  row.classList.remove('selected');
+  });
+  clearShading();
+}
+
+/* ============================================================
+   TIMER & STATS UPDATE
+   ============================================================ */
+function updateStats() {
+  document.getElementById('score-val').textContent = score.correct+'/'+score.total;
+  document.getElementById('qnum-val').textContent  = questionCount;
+}
+
+function restartTimer() {
+  clearInterval(timerInterval); 
+  timerSeconds = 0; // Hve 0 thi start thashe
+  renderTimer();
+  timerInterval = setInterval(() => {
+    timerSeconds++; // Samay vadhshe
+    renderTimer();
+  }, 1000);
+}
+
+function renderTimer() {
+  const m  = Math.floor(timerSeconds/60);
+  const s  = timerSeconds % 60;
+  const el = document.getElementById('timer-display');
+  el.textContent = '⏱ '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+/* ============================================================
+   MODE SWITCHER
+   ============================================================ */
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-numbers').classList.toggle('active', m==='numbers');
+  document.getElementById('btn-letters').classList.toggle('active', m==='letters');
+  newRandomSet();
+}
+
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
+buildOpsList();
+newRandomSet();
+</script>
+</body>
+</html>
